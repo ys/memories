@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { getGalleries, hashString, seededRandom, pickColor } from "@/lib/photos";
+import type { Metadata } from "next";
+import {
+  getGalleries,
+  hashString,
+  seededRandom,
+  pickColor,
+} from "@/lib/photos";
 import { GalleryBoard } from "@/components/gallery-board";
 
 function readHomeContent() {
@@ -14,6 +20,16 @@ function readHomeContent() {
   } catch {
     return { title: "", description: "" };
   }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { title, description } = readHomeContent();
+  return {
+    title: title || "Yannick's Dailies",
+    description:
+      description ||
+      "Small moments no one notices. A collection of polaroid memories.",
+  };
 }
 
 export default function Home() {
@@ -47,5 +63,11 @@ export default function Home() {
     };
   });
 
-  return <GalleryBoard galleries={galleries} title={title} description={description} />;
+  return (
+    <GalleryBoard
+      galleries={galleries}
+      title={title}
+      description={description}
+    />
+  );
 }
