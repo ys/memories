@@ -1,3 +1,5 @@
-# Memories
+# Yannick dailies
 
-A photo a day, every day.
+Small moments no one notices.  
+
+

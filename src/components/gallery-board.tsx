@@ -45,13 +45,13 @@ export function GalleryBoard({ galleries, title, description }: GalleryBoardProp
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-      <div className="fixed top-6 left-6 z-[1000] flex items-start gap-4 select-none pointer-events-none">
+      <div className=" text-yellow fixed top-6 left-6 z-[1000] flex items-start gap-4 select-none pointer-events-none">
         <Image
           src="/logo.svg"
           alt=""
           width={64}
           height={64}
-          className="opacity-70 drop-shadow-lg"
+          className="hidden fill-current opacity-70 drop-shadow-lg"
           style={{ width: 64, height: 64 }}
         />
         <div className="flex flex-col gap-2 pt-1">
