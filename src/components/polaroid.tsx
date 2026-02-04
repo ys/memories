@@ -19,8 +19,8 @@ export interface PolaroidProps {
 }
 
 const IMG_SIZE = 220;
-const PADDING = 8;
-const PADDING_BOTTOM = 32;
+const PADDING = 16;
+const PADDING_BOTTOM = 48;
 
 export const CARD_W = IMG_SIZE + PADDING * 2;
 export const CARD_H = IMG_SIZE + PADDING + PADDING_BOTTOM;

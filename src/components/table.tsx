@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Polaroid, CARD_W, CARD_H } from "./polaroid";
@@ -88,15 +88,35 @@ export function Table({ photos, title }: TableProps) {
     setEnlarged(null);
   }, []);
 
+  const goNext = useCallback(() => {
+    setEnlarged((prev) => (prev === null ? null : (prev + 1) % photos.length));
+  }, [photos.length]);
+
+  const goPrev = useCallback(() => {
+    setEnlarged((prev) =>
+      prev === null ? null : (prev - 1 + photos.length) % photos.length,
+    );
+  }, [photos.length]);
+
+  const touchStartX = useRef<number | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setEnlarged(null);
+      } else if (e.key === "ArrowRight") {
+        setEnlarged((prev) =>
+          prev === null ? null : (prev + 1) % photos.length,
+        );
+      } else if (e.key === "ArrowLeft") {
+        setEnlarged((prev) =>
+          prev === null ? null : (prev - 1 + photos.length) % photos.length,
+        );
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [photos.length]);
 
   // Override body overflow when in grid mode
   useEffect(() => {
@@ -190,20 +210,55 @@ export function Table({ photos, title }: TableProps) {
 
       {enlarged !== null && (
         <div
-          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 transition-opacity duration-300"
+          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300"
           onClick={dismiss}
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0].clientX;
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartX.current === null) return;
+            const dx = e.changedTouches[0].clientX - touchStartX.current;
+            touchStartX.current = null;
+            if (dx < -50) goNext();
+            else if (dx > 50) goPrev();
+          }}
         >
+          {/* Polaroid frame */}
           <div
-            className="bg-white p-3 pb-10 shadow-2xl transition-transform duration-300"
+            className="relative flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={photos[enlarged].src}
-              alt={photos[enlarged].alt}
-              width={800}
-              height={800}
-              className="max-h-[80vh] max-w-[90vw] object-contain"
-            />
+            <div
+              className="bg-white shadow-2xl transition-transform duration-300 inline-flex"
+              style={{
+                padding: "24px 24px 64px 24px",
+              }}
+            >
+              <Image
+                src={photos[enlarged].src}
+                alt={photos[enlarged].alt}
+                width={800}
+                height={800}
+                className="block max-h-[70vh] max-w-[85vw] object-contain"
+                style={{
+                  width: "auto",
+                  height: "auto",
+                  maxHeight: "70vh",
+                  maxWidth: "85vw",
+                }}
+              />
+            </div>
+
+            {/* Counter */}
+            <span
+              className="mt-4 text-white/70 text-sm"
+              style={{
+                fontFamily: "var(--font-typewriter), serif",
+                letterSpacing: "0.15em",
+              }}
+            >
+              {enlarged + 1} / {photos.length}
+            </span>
           </div>
         </div>
       )}
