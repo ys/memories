@@ -25,10 +25,8 @@ function readHomeContent() {
 export async function generateMetadata(): Promise<Metadata> {
   const { title, description } = readHomeContent();
   return {
-    title: title || "Yannick's Dailies",
-    description:
-      description ||
-      "Small moments no one notices. A collection of polaroid memories.",
+    title: title || "Yannick's Daily Captures",
+    description: description || "Small moments I liked enough to capture.",
   };
 }
 

@@ -117,7 +117,7 @@ except:
     subtitle_font = ImageFont.load_default()
 
 # Title text with wide letter spacing
-title_text = "YANNICK DAILIES"
+title_text = "YANNICK DAILY CAPTURES"
 draw.text(
     (box_x + box1_width // 2, box1_y + box1_height // 2),
     title_text,
@@ -127,7 +127,7 @@ draw.text(
 )
 
 # Subtitle text
-subtitle_text = "SMALL MOMENTS NO ONE NOTICES."
+subtitle_text = "SMALL MOMENTS WORTH KEEPING"
 draw.text(
     (box_x + box2_width // 2, box2_y + box2_height // 2),
     subtitle_text,

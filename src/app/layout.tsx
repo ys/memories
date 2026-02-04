@@ -14,11 +14,11 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Yannick's Daily Memories - Polaroid Moments & Life",
-    template: "%s | Yannick's Daily Memories",
+    default: "Yannick's Daily Captures - Small Moments Worth Keeping",
+    template: "%s | Yannick's Daily Captures",
   },
   description:
-    "Small moments no one notices. Yannick's daily photo collection captured through polaroid-style photography - a table full of everyday memories.",
+    "Small moments I liked enough to capture. A collection of everyday life fragments presented as polaroid-style photos.",
   keywords: [
     "photography",
     "polaroid",
@@ -33,10 +33,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "Yannick's Daily Memories",
-    title: "Yannick's Daily Memories - Polaroid Moments & Life",
+    siteName: "Yannick's Daily Captures",
+    title: "Yannick's Daily Captures - Small Moments Worth Keeping",
     description:
-      "Small moments no one notices. Yannick's daily photo collection captured through polaroid-style photography - a table full of everyday memories.",
+      "Small moments I liked enough to capture. A collection of everyday life fragments presented as polaroid-style photos.",
     images: [
       {
         url: "/og-image.jpg",
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yannick's Daily Memories - Polaroid Moments & Life",
+    title: "Yannick's Daily Captures - Small Moments Worth Keeping",
     description:
-      "Small moments no one notices. Yannick's daily photo collection captured through polaroid-style photography - a table full of everyday memories.",
+      "Small moments I liked enough to capture. A collection of everyday life fragments presented as polaroid-style photos.",
     images: ["/og-image.jpg"],
     creator: "@yannick",
   },
