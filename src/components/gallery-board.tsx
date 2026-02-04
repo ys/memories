@@ -3,8 +3,7 @@
 import { useState, useCallback } from "react";
 import Image from "next/image";
 import { GalleryCard, GalleryCardData } from "./gallery-card";
-import Icon from "./icon";
-import logoSvg from "../../public/logo.svg";
+import { Logo } from "./logo";
 
 interface GalleryBoardProps {
   galleries: GalleryCardData[];
@@ -50,22 +49,8 @@ export function GalleryBoard({
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-      <div className=" text-yellow fixed top-6 left-6 z-[1000] flex items-center gap-4 select-none pointer-events-none">
-        <div
-          className="bg-white shadow-xl"
-          style={{
-            padding: "4px",
-            paddingBottom: "12px",
-            transform: "rotate(-2deg)",
-          }}
-        >
-          <div
-            className="bg-gray-400 flex items-center justify-center p-2"
-            style={{ width: 48, height: 48 }}
-          >
-            <Icon src={logoSvg} className="text-yellow-400" />
-          </div>
-        </div>
+      <Logo />
+      <div className=" text-yellow fixed top-6 left-24 z-[1000] flex items-center gap-4 select-none pointer-events-none">
         <div className="flex flex-col gap-2">
           {title && (
             <h1

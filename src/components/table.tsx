@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Polaroid, CARD_W, CARD_H } from "./polaroid";
+import { Logo } from "./logo";
 
 interface PhotoData {
   src: string;
@@ -28,7 +29,10 @@ function useGridPositions(count: number, isGrid: boolean) {
   useEffect(() => {
     if (!isGrid) return;
     const vw = window.innerWidth;
-    const cols = Math.max(1, Math.floor((vw - GRID_PADDING * 2 + GAP) / (CARD_W + GAP)));
+    const cols = Math.max(
+      1,
+      Math.floor((vw - GRID_PADDING * 2 + GAP) / (CARD_W + GAP)),
+    );
     const totalW = cols * CARD_W + (cols - 1) * GAP;
     const startX = (vw - totalW) / 2;
 
@@ -36,7 +40,7 @@ function useGridPositions(count: number, isGrid: boolean) {
       Array.from({ length: count }, (_, i) => ({
         x: startX + (i % cols) * (CARD_W + GAP),
         y: GRID_TOP + Math.floor(i / cols) * (CARD_H + GAP),
-      }))
+      })),
     );
   }, [count, isGrid]);
 
@@ -46,7 +50,10 @@ function useGridPositions(count: number, isGrid: boolean) {
 function gridContentHeight(count: number) {
   if (typeof window === "undefined") return 0;
   const vw = window.innerWidth;
-  const cols = Math.max(1, Math.floor((vw - GRID_PADDING * 2 + GAP) / (CARD_W + GAP)));
+  const cols = Math.max(
+    1,
+    Math.floor((vw - GRID_PADDING * 2 + GAP) / (CARD_W + GAP)),
+  );
   const rows = Math.ceil(count / cols);
   return GRID_TOP + rows * (CARD_H + GAP) + GRID_PADDING;
 }
@@ -108,13 +115,14 @@ export function Table({ photos, title }: TableProps) {
       className={`relative w-screen ${isGrid ? "min-h-screen overflow-y-auto" : "h-screen overflow-hidden"}`}
       style={containerStyle}
     >
+      <Logo />
       {title && (
         <Link
           href="/"
           className="fixed z-[1000] inline-block no-underline hover:brightness-110 transition-[filter]"
           style={{
             top: 28,
-            left: 28,
+            left: 96,
             padding: "10px 28px",
             borderRadius: 4,
             fontSize: 18,
