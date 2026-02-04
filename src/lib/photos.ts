@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 
+export { hashString, seededRandom } from "./utils";
+import { hashString, seededRandom } from "./utils";
+
 export const PHOTO_EXTENSIONS = new Set([
   ".jpg",
   ".jpeg",
@@ -8,22 +11,6 @@ export const PHOTO_EXTENSIONS = new Set([
   ".webp",
   ".avif",
 ]);
-
-export function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash);
-}
-
-export function seededRandom(seed: number): () => number {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return s / 2147483647;
-  };
-}
 
 export interface PhotoData {
   src: string;
@@ -60,6 +47,36 @@ const CARD_COLORS = [
 
 export function pickColor(name: string): string {
   return CARD_COLORS[hashString(name) % CARD_COLORS.length];
+}
+
+export function getPhotoCount(gallery: string): number {
+  const dir = path.join(photosRoot, gallery);
+  try {
+    return fs
+      .readdirSync(dir)
+      .filter((f) => PHOTO_EXTENSIONS.has(path.extname(f).toLowerCase()))
+      .length;
+  } catch {
+    return 0;
+  }
+}
+
+export function getPreviewPhotos(gallery: string, count: number): string[] {
+  const dir = path.join(photosRoot, gallery);
+  try {
+    const files = fs
+      .readdirSync(dir)
+      .filter((f) => PHOTO_EXTENSIONS.has(path.extname(f).toLowerCase()))
+      .sort();
+    const rand = seededRandom(hashString(gallery + "preview"));
+    const shuffled = files
+      .map((f) => ({ f, sort: rand() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map((x) => x.f);
+    return shuffled.slice(0, count).map((f) => `/photos/${gallery}/${f}`);
+  } catch {
+    return [];
+  }
 }
 
 export function getPhotos(gallery: string): PhotoData[] {

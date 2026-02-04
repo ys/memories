@@ -3,6 +3,8 @@ import path from "path";
 import type { Metadata } from "next";
 import {
   getGalleries,
+  getPhotoCount,
+  getPreviewPhotos,
   hashString,
   seededRandom,
   pickColor,
@@ -58,6 +60,8 @@ export default function Home() {
       initialY: baseY + jitterY,
       rotation: rand() * 16 - 8,
       color: pickColor(name),
+      photoCount: getPhotoCount(name),
+      previews: getPreviewPhotos(name, 5),
     };
   });
 
