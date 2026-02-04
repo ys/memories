@@ -1,0 +1,44 @@
+name: Sync Photos
+
+on:
+  push:
+    paths:
+      - .github/workflows/sync-photos.yml
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Setup ImageMagick
+        uses: mfinelli/setup-imagemagick@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+      - name: Remove old photos
+        run: |
+          find public/photos -name "*.webp" -delete 2>/dev/null || true
+          find public/photos -name "*.jpg" -delete 2>/dev/null || true
+      - name: Fetch albums from Lightroom
+        run: |
+          ruby bin/download-lr.rb
+      - name: Convert to webp
+        run: |
+          for file in $(find public/photos \( -iname "*.jpg" -or -iname "*.jpeg" -or -iname "*.png" \)) ; do
+            magick convert "${file}" -quality 80 -resize 1500x1500 -density 72x72 -format webp "${file%.*}.webp"
+          done
+      - name: Remove jpgs
+        run: |
+          find public/photos -name "*.jpg" -delete 2>/dev/null || true
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "github-actions"
+          git add -A public/photos/ data/albums/
+          git commit -m "Sync photos from Lightroom" || echo "nothing to do"
+          git pull --rebase origin ${{ github.ref }}
+          git push

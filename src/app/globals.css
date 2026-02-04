@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #5c3a1e;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 20px,
+      rgba(0, 0, 0, 0.03) 20px,
+      rgba(0, 0, 0, 0.03) 21px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.02) 4px,
+      rgba(255, 255, 255, 0.02) 5px
+    ),
+    linear-gradient(
+      135deg,
+      #6b4226 0%,
+      #5c3a1e 25%,
+      #7a4f30 50%,
+      #5c3a1e 75%,
+      #6b4226 100%
+    );
+}
