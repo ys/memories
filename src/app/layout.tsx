@@ -9,7 +9,7 @@ const tt2020 = localFont({
 });
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://memories.example.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://daily.yannickschutz.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
