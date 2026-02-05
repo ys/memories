@@ -70,11 +70,12 @@ export function Table({ photos, title }: TableProps) {
   const [enlarged, setEnlarged] = useState<number | null>(null);
   const [isGrid, setIsGrid] = useState(false);
   const [renderLimit, setRenderLimit] = useState(() => {
-    // On mobile, start with fewer images to prevent crashes
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      return Math.min(20, photos.length);
+    // Start with fewer images for nice drop animation
+    if (typeof window !== "undefined") {
+      const initial = window.innerWidth < 768 ? 20 : 30;
+      return Math.min(initial, photos.length);
     }
-    return photos.length;
+    return Math.min(30, photos.length);
   });
 
   const gridPositions = useGridPositions(photos.length, isGrid);
