@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDraggable } from "@/hooks/use-draggable";
 
 export interface PolaroidProps {
@@ -39,6 +39,7 @@ export function Polaroid({
   gridY,
 }: PolaroidProps) {
   const [loaded, setLoaded] = useState(false);
+  const [hasDropped, setHasDropped] = useState(false);
 
   const { ref, onPointerDown, onPointerMove, onPointerUp } = useDraggable({
     initialX,
@@ -50,6 +51,13 @@ export function Polaroid({
     gridX,
     gridY,
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasDropped(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div
@@ -63,6 +71,9 @@ export function Polaroid({
         touchAction: "none",
         padding: `${PADDING}px`,
         paddingBottom: `${PADDING_BOTTOM}px`,
+        opacity: hasDropped ? 1 : 0,
+        transform: hasDropped ? "translateY(0)" : "translateY(-30px)",
+        transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
       }}
     >
       <Image

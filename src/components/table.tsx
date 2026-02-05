@@ -72,7 +72,7 @@ export function Table({ photos, title }: TableProps) {
   const [renderLimit, setRenderLimit] = useState(() => {
     // On mobile, start with fewer images to prevent crashes
     if (typeof window !== "undefined" && window.innerWidth < 768) {
-      return Math.min(40, photos.length);
+      return Math.min(20, photos.length);
     }
     return photos.length;
   });
@@ -137,8 +137,8 @@ export function Table({ photos, title }: TableProps) {
   useEffect(() => {
     if (renderLimit < photos.length) {
       const timer = setTimeout(() => {
-        setRenderLimit((prev) => Math.min(prev + 20, photos.length));
-      }, 500);
+        setRenderLimit((prev) => Math.min(prev + 10, photos.length));
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [renderLimit, photos.length]);
