@@ -72,7 +72,7 @@ export function Table({ photos, title }: TableProps) {
   const [renderLimit, setRenderLimit] = useState(() => {
     // Start with fewer images for nice drop animation
     if (typeof window !== "undefined") {
-      const initial = window.innerWidth < 768 ? 20 : 30;
+      const initial = window.innerWidth < 768 ? 5 : 30;
       return Math.min(initial, photos.length);
     }
     return Math.min(30, photos.length);
@@ -134,12 +134,16 @@ export function Table({ photos, title }: TableProps) {
     };
   }, [isGrid]);
 
-  // Progressively load more polaroids after initial render on mobile
+  // Progressively load more polaroids after initial render
   useEffect(() => {
     if (renderLimit < photos.length) {
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const batchSize = isMobile ? 3 : 10;
+      const delay = isMobile ? 500 : 300;
+
       const timer = setTimeout(() => {
-        setRenderLimit((prev) => Math.min(prev + 10, photos.length));
-      }, 300);
+        setRenderLimit((prev) => Math.min(prev + batchSize, photos.length));
+      }, delay);
       return () => clearTimeout(timer);
     }
   }, [renderLimit, photos.length]);
