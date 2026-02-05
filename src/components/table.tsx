@@ -212,7 +212,7 @@ export function Table({ photos, title }: TableProps) {
 
       {enlarged !== null && (
         <div
-          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/90 transition-opacity duration-300"
+          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300"
           onClick={dismiss}
           onTouchStart={(e) => {
             touchStartX.current = e.touches[0].clientX;
