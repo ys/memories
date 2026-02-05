@@ -69,6 +69,13 @@ export function Table({ photos, title }: TableProps) {
   });
   const [enlarged, setEnlarged] = useState<number | null>(null);
   const [isGrid, setIsGrid] = useState(false);
+  const [renderLimit, setRenderLimit] = useState(() => {
+    // On mobile, start with fewer images to prevent crashes
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      return Math.min(40, photos.length);
+    }
+    return photos.length;
+  });
 
   const gridPositions = useGridPositions(photos.length, isGrid);
 
@@ -125,6 +132,16 @@ export function Table({ photos, title }: TableProps) {
       document.body.style.overflow = "";
     };
   }, [isGrid]);
+
+  // Progressively load more polaroids after initial render on mobile
+  useEffect(() => {
+    if (renderLimit < photos.length) {
+      const timer = setTimeout(() => {
+        setRenderLimit((prev) => Math.min(prev + 20, photos.length));
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [renderLimit, photos.length]);
 
   const containerStyle = isGrid
     ? { minHeight: gridContentHeight(photos.length) }
@@ -191,7 +208,7 @@ export function Table({ photos, title }: TableProps) {
         {isGrid ? "scatter" : "sort"}
       </button>
 
-      {photos.map((photo, i) => (
+      {photos.slice(0, renderLimit).map((photo, i) => (
         <Polaroid
           key={photo.src}
           src={photo.src}
