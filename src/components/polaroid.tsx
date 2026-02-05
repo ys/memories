@@ -65,35 +65,41 @@ export function Polaroid({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
-      className="absolute top-0 left-0 cursor-grab select-none bg-white shadow-xl transition-shadow duration-200"
+      className="absolute top-0 left-0 cursor-grab select-none"
       style={{
         zIndex,
         touchAction: "none",
-        padding: `${PADDING}px`,
-        paddingBottom: `${PADDING_BOTTOM}px`,
-        opacity: hasDropped ? 1 : 0,
-        transform: hasDropped ? "translateY(0)" : "translateY(-30px)",
-        transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
       }}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={IMG_SIZE}
-        height={IMG_SIZE}
-        loading="lazy"
-        quality={60}
-        sizes={`${IMG_SIZE}px`}
-        className="pointer-events-none aspect-square object-cover"
+      <div
+        className="bg-white shadow-xl transition-shadow duration-200"
         style={{
-          width: IMG_SIZE,
-          height: IMG_SIZE,
-          opacity: loaded ? 1 : 0,
-          transition: "opacity 0.3s ease-out",
+          padding: `${PADDING}px`,
+          paddingBottom: `${PADDING_BOTTOM}px`,
+          opacity: hasDropped ? 1 : 0,
+          transform: hasDropped ? "translateY(0)" : "translateY(-30px)",
+          transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
         }}
-        draggable={false}
-        onLoad={() => setLoaded(true)}
-      />
+      >
+        <Image
+          src={src}
+          alt={alt}
+          width={IMG_SIZE}
+          height={IMG_SIZE}
+          loading="lazy"
+          quality={60}
+          sizes={`${IMG_SIZE}px`}
+          className="pointer-events-none aspect-square object-cover"
+          style={{
+            width: IMG_SIZE,
+            height: IMG_SIZE,
+            opacity: loaded ? 1 : 0,
+            transition: "opacity 0.3s ease-out",
+          }}
+          draggable={false}
+          onLoad={() => setLoaded(true)}
+        />
+      </div>
     </div>
   );
 }
