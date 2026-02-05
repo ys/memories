@@ -78,10 +78,7 @@ export function Polaroid({
           width: IMG_SIZE,
           height: IMG_SIZE,
           opacity: loaded ? 1 : 0,
-          filter: loaded
-            ? "saturate(1) brightness(1) blur(0px)"
-            : "saturate(0) brightness(1.8) blur(2px)",
-          transition: "opacity 1.5s ease-out, filter 2.5s ease-out",
+          transition: "opacity 0.3s ease-out",
         }}
         draggable={false}
         onLoad={() => setLoaded(true)}
