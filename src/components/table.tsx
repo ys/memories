@@ -138,8 +138,8 @@ export function Table({ photos, title }: TableProps) {
   useEffect(() => {
     if (renderLimit < photos.length) {
       const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-      const batchSize = isMobile ? 3 : 10;
-      const delay = isMobile ? 500 : 300;
+      const batchSize = isMobile ? 8 : 10;
+      const delay = isMobile ? 200 : 300;
 
       const timer = setTimeout(() => {
         setRenderLimit((prev) => Math.min(prev + batchSize, photos.length));
