@@ -22,6 +22,8 @@ interface TableProps {
 const GAP = 20;
 const GRID_TOP = 80;
 const GRID_PADDING = 24;
+const STACK_OVERLAP = 40; // How much polaroids overlap in stack mode
+const STACK_TOP = 120;
 
 function useGridPositions(count: number, isGrid: boolean) {
   const [positions, setPositions] = useState<{ x: number; y: number }[]>([]);
@@ -47,6 +49,33 @@ function useGridPositions(count: number, isGrid: boolean) {
   return positions;
 }
 
+function useStackPositions(count: number, isMobile: boolean) {
+  const [positions, setPositions] = useState<{ x: number; y: number; rotation: number }[]>([]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const vw = window.innerWidth;
+    const centerX = (vw - CARD_W) / 2;
+
+    setPositions(
+      Array.from({ length: count }, (_, i) => {
+        // Small random offset from center
+        const offsetX = (Math.random() - 0.5) * 30;
+        // Small random rotation
+        const rotation = (Math.random() - 0.5) * 8;
+
+        return {
+          x: centerX + offsetX,
+          y: STACK_TOP + i * (CARD_H - STACK_OVERLAP),
+          rotation,
+        };
+      }),
+    );
+  }, [count, isMobile]);
+
+  return positions;
+}
+
 function gridContentHeight(count: number) {
   if (typeof window === "undefined") return 0;
   const vw = window.innerWidth;
@@ -56,6 +85,10 @@ function gridContentHeight(count: number) {
   );
   const rows = Math.ceil(count / cols);
   return GRID_TOP + rows * (CARD_H + GAP) + GRID_PADDING;
+}
+
+function stackContentHeight(count: number) {
+  return STACK_TOP + count * (CARD_H - STACK_OVERLAP) + GRID_PADDING;
 }
 
 export function Table({ photos, title }: TableProps) {
@@ -69,16 +102,23 @@ export function Table({ photos, title }: TableProps) {
   });
   const [enlarged, setEnlarged] = useState<number | null>(null);
   const [isGrid, setIsGrid] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
   const [renderLimit, setRenderLimit] = useState(() => {
     // Start with fewer images for nice drop animation
     if (typeof window !== "undefined") {
-      const initial = window.innerWidth < 768 ? 5 : 30;
+      const initial = window.innerWidth < 768 ? 5 : 50;
       return Math.min(initial, photos.length);
     }
-    return Math.min(30, photos.length);
+    return Math.min(50, photos.length);
   });
 
   const gridPositions = useGridPositions(photos.length, isGrid);
+  const stackPositions = useStackPositions(photos.length, isMobile);
 
   const bringToFront = useCallback((index: number) => {
     setZCounter((prev) => {
@@ -126,20 +166,29 @@ export function Table({ photos, title }: TableProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [photos.length]);
 
-  // Override body overflow when in grid mode
+  // Track mobile/desktop breakpoint
   useEffect(() => {
-    document.body.style.overflow = isGrid ? "auto" : "";
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Override body overflow when in grid mode or mobile stack mode
+  useEffect(() => {
+    document.body.style.overflow = isGrid || isMobile ? "auto" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isGrid]);
+  }, [isGrid, isMobile]);
 
   // Progressively load more polaroids after initial render
   useEffect(() => {
     if (renderLimit < photos.length) {
       const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-      const batchSize = isMobile ? 8 : 10;
-      const delay = isMobile ? 200 : 300;
+      const batchSize = isMobile ? 8 : 20;
+      const delay = isMobile ? 200 : 150;
 
       const timer = setTimeout(() => {
         setRenderLimit((prev) => Math.min(prev + batchSize, photos.length));
@@ -150,11 +199,13 @@ export function Table({ photos, title }: TableProps) {
 
   const containerStyle = isGrid
     ? { minHeight: gridContentHeight(photos.length) }
-    : undefined;
+    : isMobile
+      ? { minHeight: stackContentHeight(photos.length) }
+      : undefined;
 
   return (
     <div
-      className={`relative w-screen ${isGrid ? "min-h-screen overflow-y-auto" : "h-screen overflow-hidden"}`}
+      className={`relative w-screen ${isGrid || isMobile ? "min-h-screen overflow-y-auto" : "h-screen overflow-hidden"}`}
       style={containerStyle}
     >
       <Logo />
@@ -185,11 +236,12 @@ export function Table({ photos, title }: TableProps) {
         </Link>
       )}
 
-      {/* Grid toggle button */}
-      <button
-        onClick={() => setIsGrid((v) => !v)}
-        className="fixed z-[1001] no-underline hover:brightness-110 transition-[filter]"
-        style={{
+      {/* Grid toggle button - desktop only */}
+      {!isMobile && (
+        <button
+          onClick={() => setIsGrid((v) => !v)}
+          className="fixed z-[1001] no-underline hover:brightness-110 transition-[filter]"
+          style={{
           top: 28,
           right: 28,
           padding: "10px 22px",
@@ -212,23 +264,30 @@ export function Table({ photos, title }: TableProps) {
       >
         {isGrid ? "scatter" : "sort"}
       </button>
+      )}
 
-      {photos.slice(0, renderLimit).map((photo, i) => (
-        <Polaroid
-          key={photo.src}
-          src={photo.src}
-          alt={photo.alt}
-          initialX={photo.initialX}
-          initialY={photo.initialY}
-          rotation={photo.rotation}
-          zIndex={isGrid ? i + 1 : (zIndices[i] ?? i + 1)}
-          onBringToFront={() => bringToFront(i)}
-          onEnlarge={() => enlarge(i)}
-          isGrid={isGrid}
-          gridX={gridPositions[i]?.x}
-          gridY={gridPositions[i]?.y}
-        />
-      ))}
+      {photos.slice(0, renderLimit).map((photo, i) => {
+        const useStackMode = isMobile;
+        const useGridMode = isGrid && !isMobile;
+
+        return (
+          <Polaroid
+            key={photo.src}
+            src={photo.src}
+            alt={photo.alt}
+            initialX={photo.initialX}
+            initialY={photo.initialY}
+            rotation={photo.rotation}
+            zIndex={useStackMode || useGridMode ? i + 1 : (zIndices[i] ?? i + 1)}
+            onBringToFront={() => bringToFront(i)}
+            onEnlarge={() => enlarge(i)}
+            isGrid={useStackMode || useGridMode}
+            gridX={useStackMode ? stackPositions[i]?.x : gridPositions[i]?.x}
+            gridY={useStackMode ? stackPositions[i]?.y : gridPositions[i]?.y}
+            gridRotation={useStackMode ? stackPositions[i]?.rotation : undefined}
+          />
+        );
+      })}
 
       {enlarged !== null && (
         <div

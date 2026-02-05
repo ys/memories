@@ -16,6 +16,7 @@ export interface PolaroidProps {
   isGrid?: boolean;
   gridX?: number;
   gridY?: number;
+  gridRotation?: number;
 }
 
 const IMG_SIZE = 220;
@@ -37,6 +38,7 @@ export function Polaroid({
   isGrid,
   gridX,
   gridY,
+  gridRotation,
 }: PolaroidProps) {
   const [loaded, setLoaded] = useState(false);
   const [hasDropped, setHasDropped] = useState(false);
@@ -50,6 +52,7 @@ export function Polaroid({
     isGrid,
     gridX,
     gridY,
+    gridRotation,
   });
 
   useEffect(() => {
@@ -77,8 +80,8 @@ export function Polaroid({
           padding: `${PADDING}px`,
           paddingBottom: `${PADDING_BOTTOM}px`,
           opacity: hasDropped ? 1 : 0,
-          transform: hasDropped ? "translateY(0)" : "translateY(-30px)",
-          transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
+          transform: hasDropped ? "translateY(0) rotate(0deg)" : "translateY(-120px) rotate(-15deg)",
+          transition: "opacity 0.5s ease-out, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
         }}
       >
         <Image

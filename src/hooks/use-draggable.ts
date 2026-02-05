@@ -30,6 +30,7 @@ interface UseDraggableOptions {
   isGrid?: boolean;
   gridX?: number;
   gridY?: number;
+  gridRotation?: number;
 }
 
 export function useDraggable({
@@ -41,6 +42,7 @@ export function useDraggable({
   isGrid,
   gridX,
   gridY,
+  gridRotation,
 }: UseDraggableOptions) {
   const elRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
@@ -78,7 +80,8 @@ export function useDraggable({
     el.style.transition = "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)";
 
     if (isGrid && gridX !== undefined && gridY !== undefined) {
-      el.style.transform = `translate(${gridX}px, ${gridY}px) rotate(0deg)`;
+      const rot = gridRotation !== undefined ? gridRotation : 0;
+      el.style.transform = `translate(${gridX}px, ${gridY}px) rotate(${rot}deg)`;
       el.style.cursor = "pointer";
     } else {
       el.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) rotate(${currentRotation.current}deg)`;
@@ -89,7 +92,7 @@ export function useDraggable({
       el.style.transition = "";
     }, 600);
     return () => clearTimeout(tid);
-  }, [isGrid, gridX, gridY]);
+  }, [isGrid, gridX, gridY, gridRotation]);
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
