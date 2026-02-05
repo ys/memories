@@ -99,6 +99,7 @@ export function Table({ photos, title }: TableProps) {
   }, [photos.length]);
 
   const touchStartX = useRef<number | null>(null);
+  const pointerStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -221,6 +222,21 @@ export function Table({ photos, title }: TableProps) {
             touchStartX.current = null;
             if (dx < -50) goNext();
             else if (dx > 50) goPrev();
+          }}
+          onPointerDown={(e) => {
+            // Only handle mouse events (not touch, which is handled separately)
+            if (e.pointerType === "mouse") {
+              pointerStartX.current = e.clientX;
+            }
+          }}
+          onPointerUp={(e) => {
+            if (pointerStartX.current === null) return;
+            if (e.pointerType === "mouse") {
+              const dx = e.clientX - pointerStartX.current;
+              pointerStartX.current = null;
+              if (dx < -50) goNext();
+              else if (dx > 50) goPrev();
+            }
           }}
         >
           {/* Polaroid frame */}
