@@ -87,7 +87,7 @@ export function Polaroid({
           width={IMG_SIZE}
           height={IMG_SIZE}
           loading="lazy"
-          quality={50}
+          quality={75}
           sizes={`${IMG_SIZE}px`}
           className="pointer-events-none aspect-square object-cover"
           style={{
