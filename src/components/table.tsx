@@ -191,28 +191,26 @@ export function Table({ photos, title }: TableProps) {
         {isGrid ? "scatter" : "sort"}
       </button>
 
-      <div style={{ visibility: enlarged !== null ? "hidden" : "visible" }}>
-        {photos.map((photo, i) => (
-          <Polaroid
-            key={photo.src}
-            src={photo.src}
-            alt={photo.alt}
-            initialX={photo.initialX}
-            initialY={photo.initialY}
-            rotation={photo.rotation}
-            zIndex={isGrid ? i + 1 : (zIndices[i] ?? i + 1)}
-            onBringToFront={() => bringToFront(i)}
-            onEnlarge={() => enlarge(i)}
-            isGrid={isGrid}
-            gridX={gridPositions[i]?.x}
-            gridY={gridPositions[i]?.y}
-          />
-        ))}
-      </div>
+      {photos.map((photo, i) => (
+        <Polaroid
+          key={photo.src}
+          src={photo.src}
+          alt={photo.alt}
+          initialX={photo.initialX}
+          initialY={photo.initialY}
+          rotation={photo.rotation}
+          zIndex={isGrid ? i + 1 : (zIndices[i] ?? i + 1)}
+          onBringToFront={() => bringToFront(i)}
+          onEnlarge={() => enlarge(i)}
+          isGrid={isGrid}
+          gridX={gridPositions[i]?.x}
+          gridY={gridPositions[i]?.y}
+        />
+      ))}
 
       {enlarged !== null && (
         <div
-          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300"
+          className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-md transition-opacity duration-300"
           onClick={dismiss}
           onTouchStart={(e) => {
             touchStartX.current = e.touches[0].clientX;
