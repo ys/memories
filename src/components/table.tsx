@@ -98,7 +98,7 @@ export function Table({ photos, title }: TableProps) {
     );
   }, [photos.length]);
 
-  const pointerStartX = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -212,17 +212,15 @@ export function Table({ photos, title }: TableProps) {
         <div
           className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300"
           onClick={dismiss}
-          onPointerDown={(e) => {
-            pointerStartX.current = e.clientX;
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0].clientX;
           }}
-          onPointerUp={(e) => {
-            if (pointerStartX.current === null) return;
-            const dx = e.clientX - pointerStartX.current;
-            pointerStartX.current = null;
-            if (Math.abs(dx) > 50) {
-              if (dx < 0) goNext();
-              else goPrev();
-            }
+          onTouchEnd={(e) => {
+            if (touchStartX.current === null) return;
+            const dx = e.changedTouches[0].clientX - touchStartX.current;
+            touchStartX.current = null;
+            if (dx < -50) goNext();
+            else if (dx > 50) goPrev();
           }}
         >
           {/* Polaroid frame */}
