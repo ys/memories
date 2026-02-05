@@ -191,22 +191,24 @@ export function Table({ photos, title }: TableProps) {
         {isGrid ? "scatter" : "sort"}
       </button>
 
-      {photos.map((photo, i) => (
-        <Polaroid
-          key={photo.src}
-          src={photo.src}
-          alt={photo.alt}
-          initialX={photo.initialX}
-          initialY={photo.initialY}
-          rotation={photo.rotation}
-          zIndex={isGrid ? i + 1 : (zIndices[i] ?? i + 1)}
-          onBringToFront={() => bringToFront(i)}
-          onEnlarge={() => enlarge(i)}
-          isGrid={isGrid}
-          gridX={gridPositions[i]?.x}
-          gridY={gridPositions[i]?.y}
-        />
-      ))}
+      <div style={{ visibility: enlarged !== null ? "hidden" : "visible" }}>
+        {photos.map((photo, i) => (
+          <Polaroid
+            key={photo.src}
+            src={photo.src}
+            alt={photo.alt}
+            initialX={photo.initialX}
+            initialY={photo.initialY}
+            rotation={photo.rotation}
+            zIndex={isGrid ? i + 1 : (zIndices[i] ?? i + 1)}
+            onBringToFront={() => bringToFront(i)}
+            onEnlarge={() => enlarge(i)}
+            isGrid={isGrid}
+            gridX={gridPositions[i]?.x}
+            gridY={gridPositions[i]?.y}
+          />
+        ))}
+      </div>
 
       {enlarged !== null && (
         <div
