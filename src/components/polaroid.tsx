@@ -40,8 +40,9 @@ export function Polaroid({
   gridY,
   gridRotation,
 }: PolaroidProps) {
-  const [loaded, setLoaded] = useState(false);
   const [hasDropped, setHasDropped] = useState(false);
+  const [dropDelay] = useState(() => Math.random() * 400); // Random stagger
+  const [dropDuration] = useState(() => 0.5 + Math.random() * 0.3); // Vary drop speed
 
   const { ref, onPointerDown, onPointerMove, onPointerUp } = useDraggable({
     initialX,
@@ -56,11 +57,18 @@ export function Polaroid({
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    if (isMobile) {
+      // No animation on mobile
       setHasDropped(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
+    } else {
+      // Staggered rain drop animation on desktop
+      const timer = setTimeout(() => {
+        setHasDropped(true);
+      }, dropDelay);
+      return () => clearTimeout(timer);
+    }
+  }, [dropDelay]);
 
   return (
     <div
@@ -79,9 +87,10 @@ export function Polaroid({
         style={{
           padding: `${PADDING}px`,
           paddingBottom: `${PADDING_BOTTOM}px`,
-          opacity: hasDropped ? 1 : 0,
-          transform: hasDropped ? "translateY(0) rotate(0deg)" : "translateY(-120px) rotate(-15deg)",
-          transition: "opacity 0.5s ease-out, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          transform: hasDropped ? "translateY(0)" : "translateY(-500px)",
+          transition: hasDropped
+            ? `transform ${dropDuration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`
+            : "none",
         }}
       >
         <Image
@@ -96,11 +105,8 @@ export function Polaroid({
           style={{
             width: IMG_SIZE,
             height: IMG_SIZE,
-            opacity: loaded ? 1 : 0,
-            transition: "opacity 0.3s ease-out",
           }}
           draggable={false}
-          onLoad={() => setLoaded(true)}
         />
       </div>
     </div>
