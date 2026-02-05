@@ -98,7 +98,6 @@ export function Table({ photos, title }: TableProps) {
     );
   }, [photos.length]);
 
-  const touchStartX = useRef<number | null>(null);
   const pointerStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -213,29 +212,16 @@ export function Table({ photos, title }: TableProps) {
         <div
           className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300"
           onClick={dismiss}
-          onTouchStart={(e) => {
-            touchStartX.current = e.touches[0].clientX;
-          }}
-          onTouchEnd={(e) => {
-            if (touchStartX.current === null) return;
-            const dx = e.changedTouches[0].clientX - touchStartX.current;
-            touchStartX.current = null;
-            if (dx < -50) goNext();
-            else if (dx > 50) goPrev();
-          }}
           onPointerDown={(e) => {
-            // Only handle mouse events (not touch, which is handled separately)
-            if (e.pointerType === "mouse") {
-              pointerStartX.current = e.clientX;
-            }
+            pointerStartX.current = e.clientX;
           }}
           onPointerUp={(e) => {
             if (pointerStartX.current === null) return;
-            if (e.pointerType === "mouse") {
-              const dx = e.clientX - pointerStartX.current;
-              pointerStartX.current = null;
-              if (dx < -50) goNext();
-              else if (dx > 50) goPrev();
+            const dx = e.clientX - pointerStartX.current;
+            pointerStartX.current = null;
+            if (Math.abs(dx) > 50) {
+              if (dx < 0) goNext();
+              else goPrev();
             }
           }}
         >
