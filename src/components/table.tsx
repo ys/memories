@@ -110,6 +110,7 @@ export function Table({ photos, title }: TableProps) {
   const [slidePhase, setSlidePhase] = useState<"start" | "animating" | null>(
     null,
   );
+  const isAnimatingRef = useRef(false);
   const [isGrid, setIsGrid] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== "undefined") {
@@ -146,45 +147,55 @@ export function Table({ photos, title }: TableProps) {
     setOutgoingIndex(null);
     setSlideDirection(null);
     setSlidePhase(null);
+    isAnimatingRef.current = false;
   }, []);
 
   const goNext = useCallback(() => {
-    if (slideDirection) return;
-    setOutgoingIndex(enlarged);
+    if (isAnimatingRef.current || enlarged === null) return;
+    isAnimatingRef.current = true;
+
+    const currentIndex = enlarged;
+    const nextIndex = (enlarged + 1) % photos.length;
+
+    setOutgoingIndex(currentIndex);
+    setEnlarged(nextIndex);
     setSlideDirection("left");
     setSlidePhase("start");
+
     // Trigger animation on next frame
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setSlidePhase("animating");
-        setEnlarged((prev) =>
-          prev === null ? null : (prev + 1) % photos.length,
-        );
       });
     });
-  }, [photos.length, enlarged, slideDirection]);
+  }, [photos.length, enlarged]);
 
   const goPrev = useCallback(() => {
-    if (slideDirection) return;
-    setOutgoingIndex(enlarged);
+    if (isAnimatingRef.current || enlarged === null) return;
+    isAnimatingRef.current = true;
+
+    const currentIndex = enlarged;
+    const prevIndex = (enlarged - 1 + photos.length) % photos.length;
+
+    setOutgoingIndex(currentIndex);
+    setEnlarged(prevIndex);
     setSlideDirection("right");
     setSlidePhase("start");
+
     // Trigger animation on next frame
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setSlidePhase("animating");
-        setEnlarged((prev) =>
-          prev === null ? null : (prev - 1 + photos.length) % photos.length,
-        );
       });
     });
-  }, [photos.length, enlarged, slideDirection]);
+  }, [photos.length, enlarged]);
 
   // Handle animation end - clean up outgoing print
   const handleTransitionEnd = useCallback(() => {
     setOutgoingIndex(null);
     setSlideDirection(null);
     setSlidePhase(null);
+    isAnimatingRef.current = false;
   }, []);
 
   const touchStartX = useRef<number | null>(null);
