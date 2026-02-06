@@ -10,6 +10,7 @@ import {
   pickColor,
 } from "@/lib/photos";
 import { GalleryBoard } from "@/components/gallery-board";
+import siteConfig from "../../site.config";
 
 function readHomeContent() {
   const filePath = path.join(process.cwd(), "content", "home.md");
@@ -27,8 +28,8 @@ function readHomeContent() {
 export async function generateMetadata(): Promise<Metadata> {
   const { title, description } = readHomeContent();
   return {
-    title: title || "Yannick's Daily Captures",
-    description: description || "Small moments I liked enough to capture.",
+    title: title || siteConfig.title,
+    description: description || siteConfig.description,
   };
 }
 

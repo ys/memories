@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import siteConfig from "../../site.config";
 
 const tt2020 = localFont({
   src: "../fonts/TT2020Base-Regular.woff2",
@@ -8,17 +9,13 @@ const tt2020 = localFont({
   variable: "--font-typewriter",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://daily.yannickschutz.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Yannick's Daily Captures - Small Moments Worth Keeping",
-    template: "%s | Yannick's Daily Captures",
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Small moments I liked enough to capture. A collection of everyday life fragments presented as polaroid-style photos.",
+  description: siteConfig.description,
   keywords: [
     "photography",
     "polaroid",
@@ -27,32 +24,29 @@ export const metadata: Metadata = {
     "life snapshots",
     "photo gallery",
   ],
-  authors: [{ name: "Yannick" }],
-  creator: "Yannick",
+  authors: [{ name: siteConfig.author.name }],
+  creator: siteConfig.author.name,
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteUrl,
-    siteName: "Yannick's Daily Captures",
-    title: "Yannick's Daily Captures - Small Moments Worth Keeping",
-    description:
-      "Small moments I liked enough to capture. A collection of everyday life fragments presented as polaroid-style photos.",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
     images: [
       {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Memories - A collection of polaroid photos",
+        url: siteConfig.og.image,
+        width: siteConfig.og.width,
+        height: siteConfig.og.height,
+        alt: `${siteConfig.name} - A collection of polaroid photos`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yannick's Daily Captures - Small Moments Worth Keeping",
-    description:
-      "Small moments I liked enough to capture. A collection of everyday life fragments presented as polaroid-style photos.",
-    images: ["/og-image.jpg"],
-    creator: "@yannick",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.og.image],
   },
   robots: {
     index: true,

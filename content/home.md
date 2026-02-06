@@ -1,5 +1,3 @@
-# Yannick dailies
+# Pile of Prints
 
-Small moments no one notices.  
-
-
+A shoebox of daily moments worth keeping.

@@ -51,7 +51,7 @@ export function GalleryBoard({
     <div className="relative h-screen w-screen overflow-hidden">
       <Logo />
       <div className=" text-yellow fixed top-6 left-24 z-[1000] flex items-center gap-4 select-none pointer-events-none">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col items-start gap-2">
           {title && (
             <h1
               style={{
