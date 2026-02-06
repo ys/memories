@@ -50,7 +50,9 @@ function useGridPositions(count: number, isGrid: boolean) {
 }
 
 function useStackPositions(count: number, isMobile: boolean) {
-  const [positions, setPositions] = useState<{ x: number; y: number; rotation: number }[]>([]);
+  const [positions, setPositions] = useState<
+    { x: number; y: number; rotation: number }[]
+  >([]);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -101,6 +103,13 @@ export function Table({ photos, title }: TableProps) {
     return indices;
   });
   const [enlarged, setEnlarged] = useState<number | null>(null);
+  const [outgoingIndex, setOutgoingIndex] = useState<number | null>(null);
+  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(
+    null,
+  );
+  const [slidePhase, setSlidePhase] = useState<"start" | "animating" | null>(
+    null,
+  );
   const [isGrid, setIsGrid] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== "undefined") {
@@ -134,17 +143,49 @@ export function Table({ photos, title }: TableProps) {
 
   const dismiss = useCallback(() => {
     setEnlarged(null);
+    setOutgoingIndex(null);
+    setSlideDirection(null);
+    setSlidePhase(null);
   }, []);
 
   const goNext = useCallback(() => {
-    setEnlarged((prev) => (prev === null ? null : (prev + 1) % photos.length));
-  }, [photos.length]);
+    if (slideDirection) return;
+    setOutgoingIndex(enlarged);
+    setSlideDirection("left");
+    setSlidePhase("start");
+    // Trigger animation on next frame
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setSlidePhase("animating");
+        setEnlarged((prev) =>
+          prev === null ? null : (prev + 1) % photos.length,
+        );
+      });
+    });
+  }, [photos.length, enlarged, slideDirection]);
 
   const goPrev = useCallback(() => {
-    setEnlarged((prev) =>
-      prev === null ? null : (prev - 1 + photos.length) % photos.length,
-    );
-  }, [photos.length]);
+    if (slideDirection) return;
+    setOutgoingIndex(enlarged);
+    setSlideDirection("right");
+    setSlidePhase("start");
+    // Trigger animation on next frame
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setSlidePhase("animating");
+        setEnlarged((prev) =>
+          prev === null ? null : (prev - 1 + photos.length) % photos.length,
+        );
+      });
+    });
+  }, [photos.length, enlarged, slideDirection]);
+
+  // Handle animation end - clean up outgoing print
+  const handleTransitionEnd = useCallback(() => {
+    setOutgoingIndex(null);
+    setSlideDirection(null);
+    setSlidePhase(null);
+  }, []);
 
   const touchStartX = useRef<number | null>(null);
 
@@ -153,18 +194,14 @@ export function Table({ photos, title }: TableProps) {
       if (e.key === "Escape") {
         setEnlarged(null);
       } else if (e.key === "ArrowRight") {
-        setEnlarged((prev) =>
-          prev === null ? null : (prev + 1) % photos.length,
-        );
+        goNext();
       } else if (e.key === "ArrowLeft") {
-        setEnlarged((prev) =>
-          prev === null ? null : (prev - 1 + photos.length) % photos.length,
-        );
+        goPrev();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [photos.length]);
+  }, [goNext, goPrev]);
 
   // Track mobile/desktop breakpoint
   useEffect(() => {
@@ -242,28 +279,28 @@ export function Table({ photos, title }: TableProps) {
           onClick={() => setIsGrid((v) => !v)}
           className="fixed z-[1001] no-underline hover:brightness-110 transition-[filter]"
           style={{
-          top: 28,
-          right: 28,
-          padding: "10px 22px",
-          borderRadius: 4,
-          fontSize: 13,
-          fontWeight: 800,
-          textTransform: "uppercase",
-          letterSpacing: "0.25em",
-          fontFamily: "var(--font-typewriter), serif",
-          background: "#222",
-          color: "rgba(255, 255, 255, 0.92)",
-          border: "none",
-          cursor: "pointer",
-          transform: "rotate(1deg)",
-          textShadow:
-            "0 0.5px 0 rgba(255,255,255,0.25), 0 -0.5px 0 rgba(0,0,0,0.8)",
-          boxShadow:
-            "0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.4)",
-        }}
-      >
-        {isGrid ? "scatter" : "sort"}
-      </button>
+            top: 28,
+            right: 28,
+            padding: "10px 22px",
+            borderRadius: 4,
+            fontSize: 13,
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: "0.25em",
+            fontFamily: "var(--font-typewriter), serif",
+            background: "#222",
+            color: "rgba(255, 255, 255, 0.92)",
+            border: "none",
+            cursor: "pointer",
+            transform: "rotate(1deg)",
+            textShadow:
+              "0 0.5px 0 rgba(255,255,255,0.25), 0 -0.5px 0 rgba(0,0,0,0.8)",
+            boxShadow:
+              "0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.4)",
+          }}
+        >
+          {isGrid ? "scatter" : "sort"}
+        </button>
       )}
 
       {photos.slice(0, renderLimit).map((photo, i) => {
@@ -278,16 +315,36 @@ export function Table({ photos, title }: TableProps) {
             initialX={photo.initialX}
             initialY={photo.initialY}
             rotation={photo.rotation}
-            zIndex={useStackMode || useGridMode ? i + 1 : (zIndices[i] ?? i + 1)}
+            zIndex={
+              useStackMode || useGridMode ? i + 1 : (zIndices[i] ?? i + 1)
+            }
             onBringToFront={() => bringToFront(i)}
             onEnlarge={() => enlarge(i)}
             isGrid={useStackMode || useGridMode}
             gridX={useStackMode ? stackPositions[i]?.x : gridPositions[i]?.x}
             gridY={useStackMode ? stackPositions[i]?.y : gridPositions[i]?.y}
-            gridRotation={useStackMode ? stackPositions[i]?.rotation : undefined}
+            gridRotation={
+              useStackMode ? stackPositions[i]?.rotation : undefined
+            }
           />
         );
       })}
+
+      {/* Preload adjacent images */}
+      {enlarged !== null && (
+        <>
+          <link
+            rel="preload"
+            as="image"
+            href={photos[(enlarged + 1) % photos.length].src}
+          />
+          <link
+            rel="preload"
+            as="image"
+            href={photos[(enlarged - 1 + photos.length) % photos.length].src}
+          />
+        </>
+      )}
 
       {enlarged !== null && (
         <div
@@ -304,37 +361,135 @@ export function Table({ photos, title }: TableProps) {
             else if (dx > 50) goPrev();
           }}
         >
-          {/* Polaroid frame */}
+          {/* Pile of prints */}
           <div
             className="relative flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
+            style={{ perspective: "1000px" }}
           >
+            {/* Stack container */}
             <div
-              className="bg-white shadow-2xl transition-transform duration-300 inline-flex"
-              style={{
-                padding: "24px 24px 64px 24px",
-              }}
+              className="relative"
+              style={{ width: "fit-content", height: "fit-content" }}
             >
-              <Image
-                src={photos[enlarged].src}
-                alt={photos[enlarged].alt}
-                width={800}
-                height={800}
-                priority={false}
-                loading="eager"
-                className="block max-h-[70vh] max-w-[85vw] object-contain"
+              {/* Background prints (pile effect) - show 3 prints behind */}
+              {[3, 2, 1].map((offset) => {
+                const stackIndex = enlarged + offset;
+                if (stackIndex >= photos.length) return null;
+                return (
+                  <div
+                    key={`stack-${offset}`}
+                    className="absolute bg-white shadow-lg"
+                    style={{
+                      padding: "24px 24px 64px 24px",
+                      transform: `translateY(${offset * 4}px) rotate(${(offset - 2) * 2 + ((stackIndex % 3) - 1) * 1.5}deg)`,
+                      opacity: 1 - offset * 0.15,
+                      zIndex: 10 - offset,
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <div
+                      className="max-h-[70vh] max-w-[85vw]"
+                      style={{
+                        width: "auto",
+                        height: "auto",
+                        maxHeight: "70vh",
+                        maxWidth: "85vw",
+                        visibility: "hidden",
+                      }}
+                    />
+                  </div>
+                );
+              })}
+
+              {/* Current print (incoming when sliding, or static when not) */}
+              <div
+                className="relative bg-white shadow-2xl"
                 style={{
-                  width: "auto",
-                  height: "auto",
-                  maxHeight: "70vh",
-                  maxWidth: "85vw",
+                  padding: "24px 24px 64px 24px",
+                  zIndex: 15,
                 }}
-              />
+              >
+                <Image
+                  src={photos[enlarged].src}
+                  alt={photos[enlarged].alt}
+                  width={800}
+                  height={800}
+                  priority
+                  loading="eager"
+                  className="block max-h-[70vh] max-w-[85vw] object-contain"
+                  style={{
+                    width: "auto",
+                    height: "auto",
+                    maxHeight: "70vh",
+                    maxWidth: "85vw",
+                  }}
+                />
+              </div>
+
+              {/* Outgoing print (slides away when navigating) */}
+              {outgoingIndex !== null && (
+                <div
+                  className="absolute top-0 left-0 bg-white shadow-2xl"
+                  onTransitionEnd={handleTransitionEnd}
+                  style={{
+                    padding: "24px 24px 64px 24px",
+                    zIndex: 20,
+                    transform:
+                      slidePhase === "animating"
+                        ? slideDirection === "left"
+                          ? "translateX(-150%) rotate(-25deg)"
+                          : "translateX(150%) rotate(25deg)"
+                        : "translateX(0) rotate(0deg)",
+                    opacity: slidePhase === "animating" ? 0.8 : 1,
+                    transition:
+                      slidePhase === "animating"
+                        ? "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease-out"
+                        : "none",
+                  }}
+                >
+                  <Image
+                    src={photos[outgoingIndex].src}
+                    alt={photos[outgoingIndex].alt}
+                    width={800}
+                    height={800}
+                    priority={false}
+                    loading="eager"
+                    className="block max-h-[70vh] max-w-[85vw] object-contain"
+                    style={{
+                      width: "auto",
+                      height: "auto",
+                      maxHeight: "70vh",
+                      maxWidth: "85vw",
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* "Already seen" pile beneath (prints we've passed) */}
+              {enlarged > 0 && (
+                <div
+                  className="absolute bg-white shadow-md"
+                  style={{
+                    padding: "24px 24px 64px 24px",
+                    transform: "translateY(8px) rotate(-2deg)",
+                    opacity: 0.6,
+                    zIndex: 5,
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                />
+              )}
             </div>
 
             {/* Counter */}
             <span
-              className="mt-4 text-white/70 text-sm"
+              className="mt-6 text-white/70 text-sm"
               style={{
                 fontFamily: "var(--font-typewriter), serif",
                 letterSpacing: "0.15em",
