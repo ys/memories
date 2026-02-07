@@ -83,8 +83,9 @@ export function Polaroid({
       }}
     >
       <div
-        className="bg-white shadow-xl transition-shadow duration-200"
+        className="shadow-xl transition-shadow duration-200"
         style={{
+          background: "#f0ead0",
           padding: `${PADDING}px`,
           paddingBottom: `${PADDING_BOTTOM}px`,
           transform: hasDropped ? "translateY(0)" : "translateY(-500px)",

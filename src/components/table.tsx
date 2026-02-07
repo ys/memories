@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Polaroid, CARD_W, CARD_H } from "./polaroid";
 import { Logo } from "./logo";
+import Icon from "./icon";
+import logoSvg from "../../public/logo.svg";
 
 interface PhotoData {
   src: string;
@@ -24,6 +26,7 @@ const GRID_TOP = 80;
 const GRID_PADDING = 24;
 const STACK_OVERLAP = 40; // How much polaroids overlap in stack mode
 const STACK_TOP = 120;
+const PRINT_CREAM = "#f0ead0";
 
 function useGridPositions(count: number, isGrid: boolean) {
   const [positions, setPositions] = useState<{ x: number; y: number }[]>([]);
@@ -390,9 +393,10 @@ export function Table({ photos, title }: TableProps) {
                 return (
                   <div
                     key={`stack-${offset}`}
-                    className="absolute bg-white shadow-lg"
+                    className="absolute shadow-lg"
                     style={{
-                      padding: "24px 24px 64px 24px",
+                      background: PRINT_CREAM,
+                      padding: "24px 24px 100px 24px",
                       transform: `translateY(${offset * 4}px) rotate(${(offset - 2) * 2 + ((stackIndex % 3) - 1) * 1.5}deg)`,
                       opacity: 1 - offset * 0.15,
                       zIndex: 10 - offset,
@@ -418,9 +422,10 @@ export function Table({ photos, title }: TableProps) {
 
               {/* Current print (incoming when sliding, or static when not) */}
               <div
-                className="relative bg-white shadow-2xl"
+                className="relative shadow-2xl"
                 style={{
-                  padding: "24px 24px 64px 24px",
+                  background: PRINT_CREAM,
+                  padding: "24px 24px 100px 24px",
                   zIndex: 15,
                 }}
               >
@@ -439,15 +444,28 @@ export function Table({ photos, title }: TableProps) {
                     maxWidth: "85vw",
                   }}
                 />
+                <div
+                  className="absolute bottom-0 left-0 right-0 flex items-center justify-center"
+                  style={{ height: 100 }}
+                >
+                  <Icon
+                    src={logoSvg}
+                    width={48}
+                    height={48}
+                    style={{ opacity: 0.15, color: "rgba(0,0,0,0.6)" }}
+                    alt=""
+                  />
+                </div>
               </div>
 
               {/* Outgoing print (slides away when navigating) */}
               {outgoingIndex !== null && (
                 <div
-                  className="absolute top-0 left-0 bg-white shadow-2xl"
+                  className="absolute top-0 left-0 shadow-2xl"
                   onTransitionEnd={handleTransitionEnd}
                   style={{
-                    padding: "24px 24px 64px 24px",
+                    background: PRINT_CREAM,
+                    padding: "24px 24px 100px 24px",
                     zIndex: 20,
                     transform:
                       slidePhase === "animating"
@@ -483,9 +501,10 @@ export function Table({ photos, title }: TableProps) {
               {/* "Already seen" pile beneath (prints we've passed) */}
               {enlarged > 0 && (
                 <div
-                  className="absolute bg-white shadow-md"
+                  className="absolute shadow-md"
                   style={{
-                    padding: "24px 24px 64px 24px",
+                    background: PRINT_CREAM,
+                    padding: "24px 24px 100px 24px",
                     transform: "translateY(8px) rotate(-2deg)",
                     opacity: 0.6,
                     zIndex: 5,

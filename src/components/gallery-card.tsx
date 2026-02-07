@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDraggable } from "@/hooks/use-draggable";
 import { hashString, seededRandom } from "@/lib/utils";
+import Icon from "./icon";
+import logoSvg from "../../public/logo.svg";
 
 export interface GalleryCardData {
   name: string;
@@ -154,6 +156,25 @@ export function GalleryCard({
         }}
       />
 
+      {/* Logo stamp on folder */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          right: 12,
+          bottom: 12,
+          zIndex: 1,
+          opacity: 0.15,
+        }}
+      >
+        <Icon
+          src={logoSvg}
+          width={32}
+          height={32}
+          style={{ color: "rgba(0,0,0,0.6)" }}
+          alt=""
+        />
+      </div>
+
       {/* Polaroids laid on top of the folder */}
       {peeks.map((p, i) => (
         <div
@@ -165,7 +186,7 @@ export function GalleryCard({
             left: p.x,
             top: p.y + TAB_H,
             transform: `rotate(${p.rot}deg)`,
-            background: "#f5f2ed",
+            background: "#f0ead0",
             padding: `${PEEK_PAD}px ${PEEK_PAD}px ${PEEK_PAD_BOTTOM}px ${PEEK_PAD}px`,
             boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
             zIndex: 2 + i,

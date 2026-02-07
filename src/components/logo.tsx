@@ -9,18 +9,25 @@ export function Logo() {
       className="fixed top-6 left-6 z-[1001] select-none hover:scale-105 transition-transform"
     >
       <div
-        className="bg-white shadow-xl"
+        className="shadow-xl"
         style={{
+          background: "#f0ead0",
           padding: "4px",
           paddingBottom: "12px",
           transform: "rotate(-2deg)",
         }}
       >
         <div
-          className="bg-gray-400 flex items-center justify-center p-2"
-          style={{ width: 48, height: 48 }}
+          className="flex items-center justify-center"
+          style={{ width: 48, height: 48, background: "#c8b888" }}
         >
-          <Icon src={logoSvg} className="text-yellow-400" />
+          <Icon
+            src={logoSvg}
+            width={32}
+            height={32}
+            style={{ color: "#f0ead0" }}
+            alt=""
+          />
         </div>
       </div>
     </Link>
