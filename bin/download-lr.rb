@@ -20,7 +20,7 @@ class Downloader
     `mkdir -p public/photos/#{@year}`
     assets
       .each_with_index do |a, i|
-        `wget -O public/photos/#{@year}/#{i.to_s.rjust(3, "0")}.jpg https://photos.adobe.io/v2/spaces/#{@space_id}/#{a["asset"]["links"]["/rels/rendition_type/2048"]["href"]}`
+        `wget -O public/photos/#{@year}/#{i.to_s.rjust(3, "0")}.jpg https://lightroom.adobe.com/v2c/spaces/#{@space_id}/#{a["asset"]["links"]["/rels/rendition_type/2048"]["href"]}`
       end
   end
 
