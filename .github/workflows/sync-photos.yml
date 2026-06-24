@@ -31,7 +31,7 @@ jobs:
       - name: Convert to webp
         run: |
           for file in $(find public/photos \( -iname "*.jpg" -or -iname "*.jpeg" -or -iname "*.png" \)) ; do
-            magick convert "${file}" -quality 80 -resize 1500x1500 -density 72x72 -format webp "${file%.*}.webp" || echo "WARNING: skipping corrupt file ${file}"
+            magick "${file}" -quality 80 -resize 1500x1500 -density 72x72 -format webp "${file%.*}.webp" || echo "WARNING: skipping corrupt file ${file}"
           done
       - name: Remove jpgs
         run: |
